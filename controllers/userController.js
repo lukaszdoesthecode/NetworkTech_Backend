@@ -1,6 +1,5 @@
 const User = require('../models/user')
 
-// Get all users
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.find()
@@ -10,7 +9,6 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-// Get a user by ID
 const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id)
@@ -21,7 +19,6 @@ const getUserById = async (req, res) => {
     }
 }
 
-// Create a new user
 const createUser = async (req, res) => {
     const user = new User({
         username: req.body.username,
@@ -37,7 +34,6 @@ const createUser = async (req, res) => {
     }
 }
 
-// Update a user by ID
 const updateUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id)
@@ -54,20 +50,21 @@ const updateUser = async (req, res) => {
     }
 }
 
-// Delete a user by ID
 const deleteUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id)
-        if (!user) return res.status(404).json({ message: 'User not found' })
+        const user = await User.findByIdAndDelete(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
-        await user.remove()
-        res.json({ message: 'User deleted successfully' })
+        res.json({ message: 'User deleted successfully' });
     } catch (err) {
-        res.status(500).json({ message: err.message })
+        res.status(500).json({ message: err.message });
     }
-}
+};
 
-// Export the functions to be used in the router
+
+
 module.exports = {
     getAllUsers,
     getUserById,

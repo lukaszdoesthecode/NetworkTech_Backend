@@ -1,6 +1,6 @@
 const Flashcard = require('../models/flashcard');
+const FlashcardSet = require('../models/flashcardSet');
 
-// ✅ Get all flashcards
 const getAllFlashcards = async (req, res) => {
     try {
         const flashcards = await Flashcard.find();
@@ -10,7 +10,6 @@ const getAllFlashcards = async (req, res) => {
     }
 };
 
-// ✅ Get all flashcards by Set ID
 const getFlashcardsBySetId = async (req, res) => {
     try {
         const flashcards = await Flashcard.find({ setId: req.params.setId });
@@ -21,7 +20,6 @@ const getFlashcardsBySetId = async (req, res) => {
     }
 };
 
-// ✅ Get a flashcard by ID
 const getFlashcardById = async (req, res) => {
     try {
         const flashcard = await Flashcard.findById(req.params.id);
@@ -32,7 +30,6 @@ const getFlashcardById = async (req, res) => {
     }
 };
 
-// ✅ Create a new flashcard
 const createFlashcard = async (req, res) => {
     const flashcard = new Flashcard({
         setId: req.body.setId,
@@ -48,11 +45,17 @@ const createFlashcard = async (req, res) => {
     }
 };
 
-// ✅ Update a flashcard by ID
 const updateFlashcard = async (req, res) => {
     try {
         const flashcard = await Flashcard.findById(req.params.id);
-        if (!flashcard) return res.status(404).json({ message: 'Flashcard not found' });
+        if (!flashcard) {
+            return res.status(404).json({ message: 'Flashcard not found' });
+        }
+
+        const flashcardSet = await FlashcardSet.findById(flashcard.setId);
+        if (!flashcardSet || flashcardSet.userId.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Access denied: You can only edit flashcards in your own sets' });
+        }
 
         if (req.body.term != null) flashcard.term = req.body.term;
         if (req.body.definition != null) flashcard.definition = req.body.definition;
@@ -60,15 +63,22 @@ const updateFlashcard = async (req, res) => {
         const updatedFlashcard = await flashcard.save();
         res.json(updatedFlashcard);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
 };
 
-// ✅ Delete a flashcard by ID
+
 const deleteFlashcard = async (req, res) => {
     try {
         const flashcard = await Flashcard.findById(req.params.id);
-        if (!flashcard) return res.status(404).json({ message: 'Flashcard not found' });
+        if (!flashcard) {
+            return res.status(404).json({ message: 'Flashcard not found' });
+        }
+
+        const flashcardSet = await FlashcardSet.findById(flashcard.setId);
+        if (!flashcardSet || flashcardSet.userId.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Access denied: You can only delete flashcards in your own sets' });
+        }
 
         await flashcard.remove();
         res.json({ message: 'Flashcard deleted successfully' });
@@ -77,7 +87,7 @@ const deleteFlashcard = async (req, res) => {
     }
 };
 
-// ✅ Export the functions to be used in the router
+
 module.exports = {
     getAllFlashcards,
     getFlashcardsBySetId,

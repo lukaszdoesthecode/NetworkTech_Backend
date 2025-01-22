@@ -1,23 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const flashcardController = require('../controllers/flashcardController');
+const authorize = require('../auth/authorize');
 
-// ✅ Route to get all flashcards
-router.get('/', flashcardController.getAllFlashcards);
+router.get('/', authorize(), flashcardController.getAllFlashcards);
 
-// ✅ Route to get flashcards by set ID
-router.get('/set/:setId', flashcardController.getFlashcardsBySetId);
+router.get('/set/:setId', authorize(), flashcardController.getFlashcardsBySetId);
 
-// ✅ Route to get a flashcard by ID
-router.get('/:id', flashcardController.getFlashcardById);
+router.get('/:id', authorize(), flashcardController.getFlashcardById);
 
-// ✅ Route to create a new flashcard
-router.post('/', flashcardController.createFlashcard);
+router.post('/', authorize(), flashcardController.createFlashcard);
 
-// ✅ Route to update a flashcard by ID
-router.patch('/:id', flashcardController.updateFlashcard);
+router.patch('/:id', authorize(), flashcardController.updateFlashcard);
 
-// ✅ Route to delete a flashcard by ID
-router.delete('/:id', flashcardController.deleteFlashcard);
+router.delete('/:id', authorize(), flashcardController.deleteFlashcard);
 
 module.exports = router;

@@ -1,26 +1,16 @@
 const express = require('express')
 const router = express.Router()
-const {
-    getAllUsers,
-    getUserById,
-    createUser,
-    updateUser,
-    deleteUser
-} = require('../controllers/userController')
+const flashcardSetController = require('../controllers/userController');
+const authorize = require('../auth/authorize');
 
-// Getting all users
-router.get('/', getAllUsers)
+router.get('/', authorize('admin'), flashcardSetController.getAllUsers)
 
-// Getting one user by ID
-router.get('/:id', getUserById)
+router.get('/:id', authorize('admin'), flashcardSetController.getUserById)
 
-// Creating a new user
-router.post('/', createUser)
+router.post('/', authorize('admin'), flashcardSetController.createUser)
 
-// Updating a user by ID
-router.patch('/:id', updateUser)
+router.patch('/:id', authorize('admin'), flashcardSetController.updateUser)
 
-// Deleting a user by ID
-router.delete('/:id', deleteUser)
+router.delete('/:id', authorize('admin'), flashcardSetController.deleteUser)
 
 module.exports = router
